@@ -58,8 +58,8 @@ module YamlDb
       column_names = table_column_names(table)
 
       each_table_page(table) do |records|
-        SerializationHelper::Utils.unhash_records(records, column_names)
         YamlDb.run_filter_rows(records)
+        SerializationHelper::Utils.unhash_records(records, column_names)
         io.write(YamlDb::Utils.chunk_records(records))
       end
     end
