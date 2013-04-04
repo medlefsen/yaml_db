@@ -12,10 +12,10 @@ module YamlDb
       @filter_rows_hooks << block
     end
 
-    def run_filter_rows(rows)
+    def run_filter_rows(rows,table)
       return unless @filter_rows_hooks
       @filter_rows_hooks.each do |p|
-        p.call(rows)
+        p.call(rows,table)
       end
     end
   end
@@ -58,7 +58,7 @@ module YamlDb
       column_names = table_column_names(table)
 
       each_table_page(table) do |records|
-        YamlDb.run_filter_rows(records)
+        YamlDb.run_filter_rows(records,table)
         SerializationHelper::Utils.unhash_records(records, column_names)
         io.write(YamlDb::Utils.chunk_records(records))
       end
