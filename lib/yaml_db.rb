@@ -6,6 +6,20 @@ require 'active_support/core_ext/kernel/reporting'
 require 'rails/railtie'
 
 module YamlDb
+  class << self
+    def filter_rows(&block)
+      @filter_rows_hooks ||= []
+      @filter_rows_hooks << block
+    end
+
+    def run_filter_rows(rows)
+      return unless @filter_rows_hooks
+      @filter_rows_hooks.each do |p|
+        p.call(rows)
+      end
+    end
+  end
+
   module Helper
     def self.loader
       YamlDb::Load
@@ -44,7 +58,8 @@ module YamlDb
       column_names = table_column_names(table)
 
       each_table_page(table) do |records|
-        rows = SerializationHelper::Utils.unhash_records(records, column_names)
+        SerializationHelper::Utils.unhash_records(records, column_names)
+        YamlDb.run_filter_rows(records)
         io.write(YamlDb::Utils.chunk_records(records))
       end
     end

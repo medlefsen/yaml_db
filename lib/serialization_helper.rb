@@ -9,9 +9,10 @@ module SerializationHelper
       @extension = helper.extension
     end
 
-    def dump(filename)
+    def dump(filename = nil)
       disable_logger
-      @dumper.dump(File.new(filename, "w"))
+      file = filename ? File.new(filename, "w") : $stdout
+      @dumper.dump(file)
       reenable_logger
     end
 
@@ -26,9 +27,10 @@ module SerializationHelper
       end
     end
 
-    def load(filename, truncate = true)
+    def load(filename = nil, truncate = true)
       disable_logger
-      @loader.load(File.new(filename, "r"), truncate)
+      file = filename ? File.new(filename, "r") : $stdin
+      @loader.load(file, truncate)
       reenable_logger
     end
 
